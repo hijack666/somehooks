@@ -106,7 +106,6 @@ let TwitchService = class TwitchService {
             headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]({
                 'client-id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
                 Authorization: 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5',
-                'Access-Control-Allow-Headers': '*',
             })
         });
     }
