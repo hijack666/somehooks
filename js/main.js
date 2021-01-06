@@ -105,7 +105,8 @@ let TwitchService = class TwitchService {
         return this.http.post('https://api.twitch.tv/helix/webhooks/hub', req, {
             headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]({
                 'client-id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
-                Authorization: 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5'
+                Authorization: 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5',
+                'Access-Control-Allow-Headers': '*',
             })
         });
     }
@@ -195,8 +196,8 @@ let AppComponent = class AppComponent {
             // 'hub.topic': 'https://api.twitch.tv/helix/users?id=73477451',
             // 'hub.callback': 'https://webhook.site/10593087-135d-411a-96c5-78edef3e0012',
             // 'hub.callback': 'http://37.21.152.173',
-            'hub.callback': 'https://somequery.ru/',
-            'hub.topic': 'https://api.twitch.tv/helix/streams?user_id=73477451',
+            'hub.callback': 'https://hijack666.github.io/somehooks/',
+            'hub.topic': 'https://api.twitch.tv/helix/streams?user_id=65411398',
             'hub.lease_seconds': '864000',
         })
             .subscribe(resp => {
