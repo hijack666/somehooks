@@ -59,7 +59,9 @@ __webpack_require__.r(__webpack_exports__);
 let TwitchService = class TwitchService {
     constructor(http) {
         this.http = http;
-        this.streamer = 'juice';
+        // streamer = '';
+        this.streamerId = '';
+        this.callhost = '';
     }
     getAuth() {
         // e.preventDefault();
@@ -79,14 +81,8 @@ let TwitchService = class TwitchService {
             headers,
         });
     }
-    fetchTwitch() {
-        // const headers = new HttpHeaders({
-        // 'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
-        // 'Authorization': 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5',
-        // 'OAuth': 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5'
-        // })
-        // params = params.append('')
-        return this.http.get('https://api.twitch.tv/helix/streams?user_login=' + this.streamer, {
+    fetchTwitch(streamer) {
+        return this.http.get(`https://api.twitch.tv/helix/streams?user_login=${streamer}`, {
             headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]({
                 'client-id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
                 Authorization: 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5'
@@ -101,11 +97,14 @@ let TwitchService = class TwitchService {
             })
         });
     }
-    streamHookPost(req) {
-        return this.http.post('https://api.twitch.tv/helix/webhooks/hub', req, {
+    // streamHookPost(req: ReqStream): Observable<ReqStream[]> {
+    streamHookPost(reqstream) {
+        // return this.http.post<any>('https://api.twitch.tv/helix/webhooks/hub', req,
+        return this.http.post('https://api.twitch.tv/helix/webhooks/hub', reqstream, {
             headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]({
                 'client-id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
                 Authorization: 'Bearer 8jvm9tkhqprdnp2rfdnrr02qx0nvs5',
+                responseType: 'json',
             })
         });
     }
@@ -137,7 +136,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _raw_loader_app_component_html__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! raw-loader!./app.component.html */ "VzVu");
 /* harmony import */ var _app_component_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./app.component.scss */ "ynWL");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ "fXoL");
-/* harmony import */ var _service_twitch_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./service/twitch.service */ "KWkD");
+/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/forms */ "3Pt+");
+/* harmony import */ var _service_twitch_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./service/twitch.service */ "KWkD");
+
 
 
 
@@ -146,13 +147,20 @@ __webpack_require__.r(__webpack_exports__);
 let AppComponent = class AppComponent {
     constructor(twitchService) {
         this.twitchService = twitchService;
+        this.streamer = '';
         this.error = '';
+        this.streamerId = '';
+        this.host = '';
     }
     ngOnInit() {
+        this.form = new _angular_forms__WEBPACK_IMPORTED_MODULE_4__["FormGroup"]({
+            streamer: new _angular_forms__WEBPACK_IMPORTED_MODULE_4__["FormControl"](''),
+            host: new _angular_forms__WEBPACK_IMPORTED_MODULE_4__["FormControl"]('')
+        });
         // this.fetchTwitch();
         // this.followHookPost();
         // this.getAuth();
-        this.streamHookPost();
+        // this.streamHookPost();
         // this.fetchTwitch();
     }
     // getAuth() {
@@ -165,10 +173,21 @@ let AppComponent = class AppComponent {
     //       console.log('final')
     //     })
     // }
+    // submit() {
+    // const formData = {...this.form.value };
+    // this.streamer = formData.streamer;
+    // this.form.reset();
+    // }
     fetchTwitch() {
-        this.twitchService.fetchTwitch()
+        const formData = Object.assign({}, this.form.value);
+        this.streamer = formData.streamer;
+        this.host = formData.host;
+        this.twitchService.fetchTwitch(this.streamer)
             .subscribe(response => {
             console.log(response);
+            this.streamerId = response.data[0].user_id;
+            // let streamerId = response.user
+            console.log(this.streamerId);
         }, errorFetch => {
             console.log(errorFetch);
         }, () => {
@@ -192,11 +211,8 @@ let AppComponent = class AppComponent {
     streamHookPost() {
         this.twitchService.streamHookPost({
             'hub.mode': 'subscribe',
-            // 'hub.topic': 'https://api.twitch.tv/helix/users?id=73477451',
-            // 'hub.callback': 'https://webhook.site/10593087-135d-411a-96c5-78edef3e0012',
-            // 'hub.callback': 'http://37.21.152.173',
-            'hub.callback': 'https://hijack666.github.io/somehooks/',
-            'hub.topic': 'https://api.twitch.tv/helix/streams?user_id=65411398',
+            'hub.callback': `${this.host}`,
+            'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${this.streamerId}`,
             'hub.lease_seconds': '864000',
         })
             .subscribe(resp => {
@@ -207,13 +223,13 @@ let AppComponent = class AppComponent {
     }
 };
 AppComponent.ctorParameters = () => [
-    { type: _service_twitch_service__WEBPACK_IMPORTED_MODULE_4__["TwitchService"] }
+    { type: _service_twitch_service__WEBPACK_IMPORTED_MODULE_5__["TwitchService"] }
 ];
 AppComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_3__["Component"])({
         selector: 'app-root',
         template: _raw_loader_app_component_html__WEBPACK_IMPORTED_MODULE_1__["default"],
-        providers: [_service_twitch_service__WEBPACK_IMPORTED_MODULE_4__["TwitchService"]],
+        providers: [_service_twitch_service__WEBPACK_IMPORTED_MODULE_5__["TwitchService"]],
         styles: [_app_component_scss__WEBPACK_IMPORTED_MODULE_2__["default"]]
     })
 ], AppComponent);
@@ -231,7 +247,7 @@ AppComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<div class='container'>\n    <!-- <button (click)=\"getAuth()\">login</button> -->\n</div>");
+/* harmony default export */ __webpack_exports__["default"] = ("<div class='container'>\n    <!-- <button (click)=\"getAuth()\">login</button> -->\n    <form class=\"card\" [formGroup]=\"form\" (ngSubmit)=\"submit()\">\n        <input type=\"text\" formControlName=\"streamer\">\n        <input type=\"text\" formControlName=\"host\">\n        <button type='submit' (click)=\"fetchTwitch()\">get streamerId</button>\n    </form>\n    \n    \n    <button (click)=\"streamHookPost()\">HOOK</button>\n</div>");
 
 /***/ }),
 
